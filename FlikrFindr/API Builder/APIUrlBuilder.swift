@@ -10,11 +10,11 @@ import Foundation
 
 struct APIUrlBuilder  {
 
-    func createPhotoFetchUrl(photo: Photo) -> URL? {
-        return URL(string:"https://farm\(photo.farm).static.flickr.com/\(photo.server)/\(photo.id)_\(photo.secret).jpg")
+    func createPhotoUrl(photo: Photo) -> String? {
+        return "https://farm\(photo.farm).static.flickr.com/\(photo.server)/\(photo.id)_\(photo.secret).jpg"
     }
 
-    func createSearchUrl(searchTerm: String, page: Int) -> URL? {
-        return URL(string: "\(Constants.API.searchURL)&api_key=\(Constants.API.apiKey)&text=\(searchTerm)&per_page=\(page)&format=json&nojsoncallback=1&sort=relevance")
+    func createSearchUrl(searchTerm: String, page: Int, perPage: Int) -> URL? {
+        return URL(string: "\(Constants.API.searchURL)&api_key=\(Constants.API.apiKey)&text=\(searchTerm)&page=\(page)&per_page=\(perPage)&format=json&nojsoncallback=1&sort=relevance")
     }
 }

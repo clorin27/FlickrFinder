@@ -11,13 +11,15 @@ import Foundation
 struct Constants {
 
     struct API {
-        
         static let apiKey = "1508443e49213ff84d566777dc211f2a"
         static let searchURL = "https://api.flickr.com/services/rest/?method=flickr.photos.search"
     }
 
     struct Image {
-
         static let imagePlaceholder = "PlaceHolderSmall"
+    }
+
+    struct Reuse {
+        static let reuseIdentifier = "PhotoSearchTableViewCell"
     }
 }

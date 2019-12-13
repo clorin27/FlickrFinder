@@ -10,42 +10,59 @@ import UIKit
 
 class PhotoSearchViewModel {
 
-    // MARK: Properties
+    // MARK: - Properties
 
-    var dataSource = [Photo]()
+    private let dataSource = NetworkDataSource()
+    var delegate: ViewModelDisplayDelegate?
 
-    private let apiBuilder = APIUrlBuilder()
-
-    // MARK: Public
-
-    func returnNumberOfItems() -> Int {
-        return dataSource.count
+    init() {
+        dataSource.delegate = self
     }
 
-    // MARK: Search Photos Data
+    // MARK: - Public
 
-    func loadPhotosData(searchTerm: String, page: Int, perPage: Int, completionHandler: ((Error?) -> Void)?) {
-        guard let url = apiBuilder.createSearchUrl(searchTerm: searchTerm, page: page, perPage: perPage) else { return }
-        let request = URLRequest(url: url)
+    public func data() -> [Photo]? {
+        return dataSource.data
+    }
 
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            do {
-                guard let data = data, let _ = response, error == nil else {
-                    if let error = error {
-                        completionHandler?(error)
-                    }
-                    return
-                }
+    public func refresh(searchTerm: String?) {
+        if let searchTerm = searchTerm {
+            dataSource.searchTerm = searchTerm
+        }
 
-                let decoder = JSONDecoder()
-                let searchResponse = try decoder.decode(SearchResults.self, from: data)
+        dataSource.refresh()
+    }
 
-                self.dataSource = searchResponse.photos.photo
+    public func empty() {
+        dataSource.empty()
+    }
 
-                completionHandler?(nil)
-            } catch {
-                print(error)
-            }
-        }.resume()
+    public func searchTerm() -> String? {
+        return dataSource.searchTerm
+    }
+
+    public func numberOfRows() -> Int? {
+        guard let data = dataSource.data else { return nil }
+
+        return data.count
+    }
+
+    public func estimatedHeightForRow() -> CGFloat {
+        return 200
+    }
+}
+
+extension PhotoSearchViewModel: NetworkingDataSourceDelegate {
+    func refreshedState(state: NetworkDataSourceState) {
+        switch state {
+        case .data:
+            delegate?.displayData()
+        case .empty:
+            delegate?.displayEmpty()
+        case .error(let error):
+            delegate?.displayError(errorMessage: error.localizedDescription )
+        default:
+            break
+        }
     }
 }
